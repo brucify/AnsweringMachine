@@ -2,7 +2,10 @@ package com.answeing.machine;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Context;
 import android.view.Menu;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class MyActivity extends Activity {
@@ -10,6 +13,9 @@ public class MyActivity extends Activity {
 	private final String TAG = this.getClass().getSimpleName();
 	private final String RESTORE = "";
 	private final String state = "fortytwo";
+	
+	private CallStateListener callStateListener;
+	private Context ctx;
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -22,7 +28,6 @@ public class MyActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_my);
-		System.out.println("asdsadsadads: " + TAG);
 		String answer = null;
 		if (savedInstanceState != null) {
 			answer = savedInstanceState.getString("answer");
@@ -30,6 +35,13 @@ public class MyActivity extends Activity {
 		Log.i(TAG, "onCreate"
 				+ (null == savedInstanceState ? "" : (RESTORE + "" + answer)));
 		Log.i(TAG, "this is a msg.");
+		
+		ctx = getApplicationContext();
+		callStateListener = new CallStateListener(ctx);
+		TelephonyManager tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+		tm.listen(callStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+		
+		
 		// Show the Up button in the action bar.
 		// getActionBar().setDisplayHomeAsUpEnabled(true);
 
