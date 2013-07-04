@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -13,9 +15,13 @@ public class MyActivity extends Activity {
 	private final String TAG = this.getClass().getSimpleName();
 	private final String RESTORE = "";
 	private final String state = "fortytwo";
+
+	private Button buttonStart;
+	private Button buttonStop;
 	
 	private CallStateListener callStateListener;
-	private Context ctx;
+	private Context ctx; // why can't i initiate it here?
+	private TelephonyManager tm;  // why can't i initiate it here?
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -28,18 +34,40 @@ public class MyActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_my);
+		
+		// what's this?
 		String answer = null;
 		if (savedInstanceState != null) {
 			answer = savedInstanceState.getString("answer");
 		}
 		Log.i(TAG, "onCreate"
 				+ (null == savedInstanceState ? "" : (RESTORE + "" + answer)));
-		Log.i(TAG, "this is a msg.");
 		
+		/* init */
 		ctx = getApplicationContext();
+		tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+
 		callStateListener = new CallStateListener(ctx);
-		TelephonyManager tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
-		tm.listen(callStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+		
+		buttonStart = (Button) findViewById(R.id.button1);
+		buttonStart.setOnClickListener(new View.OnClickListener() {	
+			@Override
+			public void onClick(View v) {
+				/* start listening */
+				tm.listen(callStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+				Log.i(TAG, "onCreate: buttonStart pushed!");
+			}
+		});
+		
+		buttonStop = (Button) findViewById(R.id.button2);
+		buttonStop.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				tm.listen(callStateListener, PhoneStateListener.LISTEN_NONE);
+				Log.i(TAG, "onCreate: buttonStop pushed!");
+			}
+		});
+		
 		
 		
 		// Show the Up button in the action bar.
